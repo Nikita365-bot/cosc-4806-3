@@ -1,5 +1,7 @@
 { pkgs }: {
 	deps = [
-		pkgs.php82
+		pkgs.php
+		pkgs.phpPackages.pdo
+		pkgs.phpPackages.pdo_mysql
 	];
 }
