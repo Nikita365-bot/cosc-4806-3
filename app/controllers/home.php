@@ -1,10 +1,11 @@
 <?php
-
+session_start();
 class Home extends Controller {
 
     public function index() {
-      $user = $this->model('User');
-      $data = $user->test();
+      if (!isset($_SESSION['auth']) || $_SESSION['auth'] != 1) {
+      header('Location: /login');
+      exit;
 			
 	    $this->view('home/index');
 	    die;

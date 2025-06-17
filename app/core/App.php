@@ -11,7 +11,9 @@ class App {
         if (isset($_SESSION['auth']) == 1) {
             //$this->method = 'index';
             $this->controller = 'home';
-        } 
+        } else {
+            $this->controller = 'login';
+        }
 
         // This will return a broken up URL
         // it will be /controller/method
@@ -36,7 +38,8 @@ class App {
             }
             unset($url[1]);
         } else {
-            header('Location: /home');
+            http_response_code(404);
+            echo "Page not found.";
             die;
         }
 
