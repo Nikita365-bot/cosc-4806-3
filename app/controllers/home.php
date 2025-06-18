@@ -1,6 +1,9 @@
 class home extends Controller {
     public function index() {
         session_start();
+var_dump($_SESSION);
+die();
+
         if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== 1) {
             header('Location: /login');
             exit;

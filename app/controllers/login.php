@@ -6,6 +6,7 @@ class Login extends Controller {
     }
 
     public function verify() {
+
         require_once 'app/models/User.php';
 
         $user = new User();

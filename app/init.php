@@ -5,12 +5,16 @@ ini_set('display_errors', 1);
 
 // ✅ Only run these if session hasn't started yet
 if (session_status() === PHP_SESSION_NONE) {
-    ini_set('session.gc_maxlifetime', 28800);
-    ini_set('session.gc_probability', 1);
-    ini_set('session.gc_divisor', 1);
-    session_set_cookie_params(28800); // 8 hours
-    session_start();
-}
+    session_set_cookie_params([
+            'lifetime' => 28800,
+            'path' => '/',
+            'domain' => '',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None'  // <-- Important for Replit
+        ]);
+        session_start();
+    }
 
 require_once 'core/App.php';
 require_once 'core/Controller.php';
