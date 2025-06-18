@@ -1,14 +1,11 @@
-<?php
-
-class Home extends Controller {
+class home extends Controller {
     public function index() {
-
-        if (!isset($_SESSION['auth'])) {
-            echo "You are not logged in";
-            return;
+        session_start();
+        if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== 1) {
+            header('Location: /login');
+            exit;
         }
 
-        $username = $_SESSION['username'];
-        require_once 'app/views/home/index.php';
+        $this->view('home/index', ['username' => $_SESSION['username']]);
     }
 }
