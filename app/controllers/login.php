@@ -1,19 +1,26 @@
 <?php
-
 class Login extends Controller {
 
-    public function index() {		
-      $this->view('login/index');
+    public function index() {
+        $this->view('login/index');
     }
 
-    public function verify(){
-      $username = $_REQUEST['username'];
-      $password = $_REQUEST['password'];
+    public function verify() {
+        require_once 'app/models/User.php';
 
-      echo $username; die;
+        $user = new User();
 
-      $user = $this->model('User');
-      $user->authenticate($username, $password); 
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        if ($user->verify($username, $password)) {
+            $_SESSION['auth'] = 1;
+            $_SESSION['username'] = $username;
+            header("Location: /home");
+            exit;
+        } else {
+            echo "<script>alert('Invalid username or password');</script>";
+            $this->view('login/index');
+        }
     }
-
 }
