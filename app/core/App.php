@@ -1,13 +1,11 @@
 <?php
-
 class App {
-
     protected $controller = 'login';
     protected $method = 'index';
     protected $params = [];
 
     public function __construct() {
-        // Default to login or home based on session
+        // Default to 'home' controller if user is authenticated
         if (isset($_SESSION['auth']) && $_SESSION['auth'] == 1) {
             $this->controller = 'home';
         }
@@ -20,6 +18,7 @@ class App {
         }
 
         require_once 'app/controllers/' . $this->controller . '.php';
+
         $this->controller = new $this->controller;
 
         if (isset($url[1]) && method_exists($this->controller, $url[1])) {
@@ -36,6 +35,6 @@ class App {
         if (isset($_GET['url'])) {
             return explode('/', filter_var(trim($_GET['url'], '/'), FILTER_SANITIZE_URL));
         }
-        return [];
-    }
+        return [];
+}
 }
