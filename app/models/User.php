@@ -29,13 +29,9 @@ class User {
         $statement->bindValue(':name', $username);
         $statement->execute();
         $rows = $statement->fetch(PDO::FETCH_ASSOC);
-		echo "<pre>";
-      print_r($rows);
-      echo "</pre>";
-      echo "Entered password: ". $password;
-      die();
+		
       
-		if ($rows && password_verify($password, $rows['password'])) {
+		if (password_verify($password, $rows['password'])) {
 			$_SESSION['auth'] = 1;
 			$_SESSION['username'] = ucwords($username);
 			unset($_SESSION['failedAuth']);

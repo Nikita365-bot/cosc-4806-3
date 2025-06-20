@@ -1,37 +1,31 @@
 <?php
-// app/controllers/Login.php
 
-require_once 'app/models/User.php';
+class Login extends Controller
+{
+    public function index()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = $_POST['username'];
+            $password = $_POST['password'];
 
-class Login extends Controller {
+            $db = db_connect();
+            $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
+            $stmt->bindValue(':username', $username);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Show the login form
-    public function index() {
-        // No session logic here – view just renders the form
+            // Plain-text password check
+            if ($row && password_verify($password, $row['password'])) {
+                $_SESSION['auth'] = 1;
+                $_SESSION['username'] = $row['username'];
+                header('Location: /home');
+                exit;
+            } else {
+                echo "Invalid username or password";
+            }
+        }
+
+        // Show the login form view
         $this->view('login/index');
-    }
-
-    // Handle form submission
-    public function verify() {
-        // Start the session
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        // Grab POST data
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-
-        // Authenticate via the User model
-        $user = new User();
-        if ($user->authenticate($username, $password)) {
-            // On success, redirect to home
-            header('Location: /home');
-            exit;
-        } else {
-            // On failure, back to login with JS alert
-            echo "<script>alert('Invalid username or password'); window.location = '/login';</script>";
-            exit;
-        }
     }
 }

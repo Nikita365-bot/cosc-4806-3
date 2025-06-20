@@ -1,23 +1,30 @@
 <?php
 class App {
-    protected $controller = 'login';
+    protected $controller = 'Login';
     protected $method = 'index';
     protected $params = [];
 
     public function __construct() {
-        // Default to 'home' controller if user is authenticated
+       
+        // Default to 'home' if authenticated
         if (isset($_SESSION['auth']) && $_SESSION['auth'] == 1) {
-            $this->controller = 'home';
+            $this->controller = 'Home';
         }
 
         $url = $this->parseUrl();
 
-        if (isset($url[0]) && file_exists('app/controllers/' . $url[0] . '.php')) {
-            $this->controller = $url[0];
-            unset($url[0]);
-        }
+        if (isset($url[0])) {
+            $controller = ucfirst($url[0]); // Capitalize first letter
 
-        require_once 'app/controllers/' . $this->controller . '.php';
+            if (file_exists('app/controllers/' . $controller . '.php')) {
+                require_once 'app/controllers/' . $controller . '.php';
+                $this->controller = $controller;
+                unset($url[0]);
+            }
+        } else {
+            // Default controller fallback
+            require_once 'app/controllers/' . ucfirst($this->controller) . '.php';
+        }
 
         $this->controller = new $this->controller;
 
@@ -35,6 +42,6 @@ class App {
         if (isset($_GET['url'])) {
             return explode('/', filter_var(trim($_GET['url'], '/'), FILTER_SANITIZE_URL));
         }
-        return [];
-}
+        return [];
+    }
 }
