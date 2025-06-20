@@ -25,6 +25,7 @@ class App {
             // Default controller fallback
             require_once 'app/controllers/' . ucfirst($this->controller) . '.php';
         }
+        echo "Trying to instantiate controller: " . $this->controller;
 
         $this->controller = new $this->controller;
 

@@ -1,3 +1,5 @@
+<?php
+
 class Home extends Controller {
     public function index() {
         if (session_status() === PHP_SESSION_NONE) {
@@ -9,7 +11,8 @@ class Home extends Controller {
             exit;
         }
 
-        // Pass session username to the view
-        $this->view('home/index', ['username' => $_SESSION['username']]);
+        $this->view('home/index', [
+            'username' => $_SESSION['username']
+        ]);
     }
 }
