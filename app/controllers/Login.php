@@ -1,31 +1,50 @@
 <?php
+class Login extends Controller {
+    public function index() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
 
-class Login extends Controller
-{
-    public function index()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'];
-            $password = $_POST['password'];
-
-            $db = db_connect();
-            $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
-            $stmt->bindValue(':username', $username);
-            $stmt->execute();
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            // Plain-text password check
-            if ($row && password_verify($password, $row['password'])) {
-                $_SESSION['auth'] = 1;
-                $_SESSION['username'] = $row['username'];
-                header('Location: /home');
-                exit;
-            } else {
-                echo "Invalid username or password";
-            }
+        if (isset($_SESSION['auth']) && $_SESSION['auth'] === 1) {
+            header("Location: /home");
+            exit;
         }
 
-        // Show the login form view
         $this->view('login/index');
+    }
+
+    
+    public function verify() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+
+        if (!isset($_POST['username'], $_POST['password'])) {
+            die('Form input missing.');
+        }
+
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        $db = db_connect();
+        $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
+        $stmt->execute([':username' => $username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['auth'] = 1;
+            $_SESSION['username'] = $user['username'];
+
+            $log = $db->prepare("INSERT INTO log (username, attempt) VALUES (:username, 'good')");
+            $log->execute([':username' => $username]);
+
+            
+            ob_clean(); 
+            header("Location: /home");
+            exit;
+        } else {
+            $log = $db->prepare("INSERT INTO log (username, attempt) VALUES (:username, 'bad')");
+            $log->execute([':username' => $username]);
+
+            ob_clean();
+            header("Location: /login");
+            exit;
+        }
     }
 }

@@ -5,16 +5,14 @@ class App {
     protected $params = [];
 
     public function __construct() {
-       
-        // Default to 'home' if authenticated
-        if (isset($_SESSION['auth']) && $_SESSION['auth'] == 1) {
-            $this->controller = 'Home';
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
 
         $url = $this->parseUrl();
 
         if (isset($url[0])) {
-            $controller = ucfirst($url[0]); // Capitalize first letter
+            $controller = ucfirst($url[0]);
 
             if (file_exists('app/controllers/' . $controller . '.php')) {
                 require_once 'app/controllers/' . $controller . '.php';
@@ -22,10 +20,8 @@ class App {
                 unset($url[0]);
             }
         } else {
-            // Default controller fallback
-            require_once 'app/controllers/' . ucfirst($this->controller) . '.php';
+            require_once 'app/controllers/' . $this->controller . '.php';
         }
-        echo "Trying to instantiate controller: " . $this->controller;
 
         $this->controller = new $this->controller;
 
@@ -39,6 +35,7 @@ class App {
         call_user_func_array([$this->controller, $this->method], $this->params);
     }
 
+    // This method is REQUIRED and must be inside the class
     public function parseUrl() {
         if (isset($_GET['url'])) {
             return explode('/', filter_var(trim($_GET['url'], '/'), FILTER_SANITIZE_URL));
